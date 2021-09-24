@@ -66,7 +66,8 @@ class MyPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter old) {
+  // Is called when the CustomPainter is rebuilt
+  bool shouldRepaint(CustomPainter oldDelegate) {
     //return old.myParameter != myParameter;
     return true;
   }
