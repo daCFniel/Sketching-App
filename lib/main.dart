@@ -32,8 +32,8 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: const Center(
-        child: Text('Canvas'),
+      body: CustomPaint(
+        painter: MyPainter(),
       ),
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
@@ -56,5 +56,18 @@ class _MainPageState extends State<MainPage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
+  }
+}
+
+class MyPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    //canvas.drawLine(p1, p2, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter old) {
+    //return old.myParameter != myParameter;
+    return true;
   }
 }
