@@ -32,8 +32,13 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomPaint(
-        painter: MyPainter(),
+      body: Container(
+        color: Colors.blue[50],
+        child: Center(
+          child: CustomPaint(
+            painter: MyPainter(),
+          ),
+        ),
       ),
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
