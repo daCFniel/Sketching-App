@@ -29,15 +29,20 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  late double _width;
+  late double _height;
+
   @override
   Widget build(BuildContext context) {
+    _width = MediaQuery.of(context).size.width;
+    _height = MediaQuery.of(context).size.height;
     return Scaffold(
       body: Container(
         color: Colors.blue[50],
-        child: Center(
-          child: CustomPaint(
-            painter: MyPainter(),
-          ),
+        width: _width,
+        height: _height,
+        child: CustomPaint(
+          painter: MyPainter(),
         ),
       ),
       bottomNavigationBar: BottomAppBar(
@@ -67,13 +72,15 @@ class _MainPageState extends State<MainPage> {
 class MyPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    //canvas.drawLine(p1, p2, paint);
+    final paint = Paint()
+      ..strokeWidth = 10
+      ..strokeCap = StrokeCap.round
+      ..color = Colors.amber;
+    canvas.drawLine(Offset(size.width * 1 / 6, size.height * 1 / 2),
+        Offset(size.width * 5 / 6, size.height * 1 / 2), paint);
   }
 
   @override
-  // Is called when the CustomPainter is rebuilt
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    //return old.myParameter != myParameter;
-    return true;
-  }
+  // Should repaint everything when a change is made
+  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }
