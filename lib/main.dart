@@ -1,3 +1,6 @@
+import 'dart:ui';
+import 'package:sketching_app/painter.dart';
+import 'package:sketching_app/point.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -31,6 +34,12 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   late double _width;
   late double _height;
+  final _sketchPoints = <SketchPoint?>[];
+
+  // Brush styling
+  final double _strokeWidth = 45.0;
+  final StrokeCap _strokeCap = StrokeCap.round;
+  final Color _color = Colors.amber;
 
   @override
   Widget build(BuildContext context) {
@@ -38,11 +47,38 @@ class _MainPageState extends State<MainPage> {
     _height = MediaQuery.of(context).size.height;
     return Scaffold(
       body: Container(
-        color: Colors.blue[50],
+        color: Colors.blue[400],
         width: _width,
         height: _height,
-        child: CustomPaint(
-          painter: MyPainter(),
+        child: GestureDetector(
+          onPanStart: (DragStartDetails details) {
+            setState(() {
+              _sketchPoints.add(SketchPoint(
+                  details.localPosition,
+                  Paint()
+                    ..strokeWidth = _strokeWidth
+                    ..strokeCap = _strokeCap
+                    ..color = _color));
+            });
+          },
+          onPanUpdate: (DragUpdateDetails details) {
+            setState(() {
+              _sketchPoints.add(SketchPoint(
+                  details.localPosition,
+                  Paint()
+                    ..strokeWidth = _strokeWidth
+                    ..strokeCap = _strokeCap
+                    ..color = _color));
+            });
+          },
+          onPanEnd: (DragEndDetails details) {
+            setState(() {
+              _sketchPoints.add(null);
+            });
+          },
+          child: CustomPaint(
+            painter: MyPainter(_sketchPoints),
+          ),
         ),
       ),
       bottomNavigationBar: BottomAppBar(
@@ -67,20 +103,4 @@ class _MainPageState extends State<MainPage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
-}
-
-class MyPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..strokeWidth = 10
-      ..strokeCap = StrokeCap.round
-      ..color = Colors.amber;
-    canvas.drawLine(Offset(size.width * 1 / 6, size.height * 1 / 2),
-        Offset(size.width * 5 / 6, size.height * 1 / 2), paint);
-  }
-
-  @override
-  // Should repaint everything when a change is made
-  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }
