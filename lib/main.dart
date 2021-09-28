@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:sketching_app/painter.dart';
 import 'package:sketching_app/point.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 void main() {
   runApp(const MyApp());
@@ -39,7 +40,37 @@ class _MainPageState extends State<MainPage> {
   // Brush styling
   final double _strokeWidth = 45.0;
   final StrokeCap _strokeCap = StrokeCap.round;
-  final Color _color = Colors.amber;
+  Color _currentColor = Colors.amber;
+
+  final double _bottomMenuHeight = 70.0;
+
+  // currentColor setter
+  void changeColor(Color color) {
+    setState(() {
+      _currentColor = color;
+    });
+  }
+
+  Widget showColorPicker(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Pick a color!'),
+      content: SingleChildScrollView(
+          child: ColorPicker(
+        pickerColor: _currentColor,
+        onColorChanged: changeColor,
+        showLabel: true,
+        pickerAreaHeightPercent: 0.8,
+      )),
+      actions: [
+        TextButton(
+            onPressed: () {
+              setState(() {});
+              Navigator.pop(context);
+            },
+            child: const Text('Done'))
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +89,7 @@ class _MainPageState extends State<MainPage> {
                   Paint()
                     ..strokeWidth = _strokeWidth
                     ..strokeCap = _strokeCap
-                    ..color = _color));
+                    ..color = _currentColor));
             });
           },
           onPanUpdate: (DragUpdateDetails details) {
@@ -68,7 +99,7 @@ class _MainPageState extends State<MainPage> {
                   Paint()
                     ..strokeWidth = _strokeWidth
                     ..strokeCap = _strokeCap
-                    ..color = _color));
+                    ..color = _currentColor));
             });
           },
           onPanEnd: (DragEndDetails details) {
@@ -84,14 +115,23 @@ class _MainPageState extends State<MainPage> {
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         child: SizedBox(
-          height: 100.0,
+          height: _bottomMenuHeight,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              IconButton(onPressed: () => {}, icon: const Icon(Icons.menu)),
-              IconButton(onPressed: () => {}, icon: const Icon(Icons.face)),
-              IconButton(onPressed: () => {}, icon: const Icon(Icons.nat)),
-              IconButton(onPressed: () => {}, icon: const Icon(Icons.kayaking))
+              IconButton(
+                  onPressed: () =>
+                      showDialog(context: context, builder: showColorPicker),
+                  icon: const Icon(Icons.palette_rounded)),
+              IconButton(
+                  onPressed: () => {},
+                  icon: const Icon(Icons.line_style_rounded)),
+              IconButton(
+                  onPressed: () => {},
+                  icon: const Icon(Icons.auto_fix_normal_rounded)),
+              IconButton(
+                  onPressed: () => _sketchPoints.clear(),
+                  icon: const Icon(Icons.refresh_rounded))
             ],
           ),
         ),
