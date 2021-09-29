@@ -41,9 +41,6 @@ class _MainPageState extends State<MainPage> {
 
   // List of points
   final _sketchPoints = <SketchPoint?>[];
-  // List of points for eraser
-  final _erasedPoints = <SketchPoint>[];
-  bool _isEraserMode = false;
 
   // Brush styling
   final double _strokeWidth = 45.0;
@@ -53,7 +50,7 @@ class _MainPageState extends State<MainPage> {
 
   //UI styling
   final double _bottomMenuHeight = 70.0;
-  Color _currentBackgroundColor = Color(0xFFABCEEB);
+  Color _currentBackgroundColor = const Color(0xFFABCEEB);
 
   @override
   Widget build(BuildContext context) {
@@ -74,40 +71,22 @@ class _MainPageState extends State<MainPage> {
         child: GestureDetector(
           onPanStart: (DragStartDetails details) {
             setState(() {
-              if (_isEraserMode) {
-                _erasedPoints.add(SketchPoint(
-                    details.localPosition,
-                    Paint()
-                      ..strokeWidth = _strokeWidth
-                      ..strokeCap = _strokeCap
-                      ..color = _currentBackgroundColor));
-              } else {
-                _sketchPoints.add(SketchPoint(
-                    details.localPosition,
-                    Paint()
-                      ..strokeWidth = _strokeWidth
-                      ..strokeCap = _strokeCap
-                      ..color = _currentBrushColor));
-              }
+              _sketchPoints.add(SketchPoint(
+                  details.localPosition,
+                  Paint()
+                    ..strokeWidth = _strokeWidth
+                    ..strokeCap = _strokeCap
+                    ..color = _currentBrushColor));
             });
           },
           onPanUpdate: (DragUpdateDetails details) {
             setState(() {
-              if (_isEraserMode) {
-                _erasedPoints.add(SketchPoint(
-                    details.localPosition,
-                    Paint()
-                      ..strokeWidth = _strokeWidth
-                      ..strokeCap = _strokeCap
-                      ..color = _currentBackgroundColor));
-              } else {
-                _sketchPoints.add(SketchPoint(
-                    details.localPosition,
-                    Paint()
-                      ..strokeWidth = _strokeWidth
-                      ..strokeCap = _strokeCap
-                      ..color = _currentBrushColor));
-              }
+              _sketchPoints.add(SketchPoint(
+                  details.localPosition,
+                  Paint()
+                    ..strokeWidth = _strokeWidth
+                    ..strokeCap = _strokeCap
+                    ..color = _currentBrushColor));
             });
           },
           onPanEnd: (DragEndDetails details) {
@@ -116,7 +95,7 @@ class _MainPageState extends State<MainPage> {
             });
           },
           child: CustomPaint(
-            painter: MyPainter(_sketchPoints, _erasedPoints, _isEraserMode),
+            painter: MyPainter(_sketchPoints),
           ),
         ),
       ),
