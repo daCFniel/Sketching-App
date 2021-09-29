@@ -40,24 +40,53 @@ class _MainPageState extends State<MainPage> {
   // Brush styling
   final double _strokeWidth = 45.0;
   final StrokeCap _strokeCap = StrokeCap.round;
-  Color _currentColor = Colors.amber;
+  Color _currentBrushColor = Colors.amber;
 
+  //UI styling
   final double _bottomMenuHeight = 70.0;
+  Color _currentBackgroundColor = Colors.blue.shade400;
 
   // currentColor setter
-  void changeColor(Color color) {
+  void changeColorBrush(Color color) {
     setState(() {
-      _currentColor = color;
+      _currentBrushColor = color;
     });
   }
 
-  Widget showColorPicker(BuildContext context) {
+  void changeColorBackground(Color color) {
+    setState(() {
+      _currentBackgroundColor = color;
+    });
+  }
+
+  Widget showColorPickerBrush(BuildContext context) {
     return AlertDialog(
-      title: const Text('Pick a color!'),
+      title: const Text('Brush color!'),
       content: SingleChildScrollView(
           child: ColorPicker(
-        pickerColor: _currentColor,
-        onColorChanged: changeColor,
+        pickerColor: _currentBrushColor,
+        onColorChanged: changeColorBrush,
+        showLabel: true,
+        pickerAreaHeightPercent: 0.8,
+      )),
+      actions: [
+        TextButton(
+            onPressed: () {
+              setState(() {});
+              Navigator.pop(context);
+            },
+            child: const Text('Done'))
+      ],
+    );
+  }
+
+  Widget showColorPickerBackground(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Background coslor!'),
+      content: SingleChildScrollView(
+          child: ColorPicker(
+        pickerColor: _currentBackgroundColor,
+        onColorChanged: changeColorBackground,
         showLabel: true,
         pickerAreaHeightPercent: 0.8,
       )),
@@ -78,7 +107,7 @@ class _MainPageState extends State<MainPage> {
     _height = MediaQuery.of(context).size.height;
     return Scaffold(
       body: Container(
-        color: Colors.blue[400],
+        color: _currentBackgroundColor,
         width: _width,
         height: _height,
         child: GestureDetector(
@@ -89,7 +118,7 @@ class _MainPageState extends State<MainPage> {
                   Paint()
                     ..strokeWidth = _strokeWidth
                     ..strokeCap = _strokeCap
-                    ..color = _currentColor));
+                    ..color = _currentBrushColor));
             });
           },
           onPanUpdate: (DragUpdateDetails details) {
@@ -99,7 +128,7 @@ class _MainPageState extends State<MainPage> {
                   Paint()
                     ..strokeWidth = _strokeWidth
                     ..strokeCap = _strokeCap
-                    ..color = _currentColor));
+                    ..color = _currentBrushColor));
             });
           },
           onPanEnd: (DragEndDetails details) {
@@ -120,8 +149,8 @@ class _MainPageState extends State<MainPage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               IconButton(
-                  onPressed: () =>
-                      showDialog(context: context, builder: showColorPicker),
+                  onPressed: () => showDialog(
+                      context: context, builder: showColorPickerBackground),
                   icon: const Icon(Icons.palette_rounded)),
               IconButton(
                   onPressed: () => {},
@@ -137,7 +166,8 @@ class _MainPageState extends State<MainPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => {},
+        onPressed: () =>
+            showDialog(context: context, builder: showColorPickerBrush),
         child: const Icon(Icons.brush_rounded),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
