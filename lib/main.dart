@@ -123,13 +123,16 @@ class _MainPageState extends State<MainPage> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () =>
+      floatingActionButton: GestureDetector(
+        onLongPress: () =>
             showDialog(context: context, builder: showColorPickerBrush),
-        child: const Icon(Icons.brush_rounded),
-        backgroundColor: _currentBrushColor,
-        foregroundColor: _brushIconColor,
-        hoverColor: TinyColor(_currentBrushColor).brighten(10).color,
+        child: FloatingActionButton(
+          onPressed: () => {},
+          child: const Icon(Icons.brush_rounded),
+          backgroundColor: _currentBrushColor,
+          foregroundColor: _brushIconColor,
+          hoverColor: TinyColor(_currentBrushColor).brighten(10).color,
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
