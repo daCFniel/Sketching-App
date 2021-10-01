@@ -44,7 +44,7 @@ class _MainPageState extends State<MainPage> {
   final _sketchPoints = <SketchPoint?>[];
 
   // Brush styling
-  final double _strokeWidth = 45.0;
+  double _strokeWidth = 20.0;
   final StrokeCap _strokeCap = StrokeCap.round;
   Color _currentBrushColor = Colors.deepOrange;
   Color _displayBrushColor = Colors.deepOrange;
@@ -84,6 +84,21 @@ class _MainPageState extends State<MainPage> {
     }
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar:
+          AppBar(backgroundColor: Colors.transparent, elevation: 0.0, actions: [
+        ElevatedButton(
+          onPressed: () => Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => const MainPage())),
+          child: const Icon(Icons.add),
+          style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(
+                  TinyColor(Colors.grey).setOpacity(0.1).color),
+              elevation: MaterialStateProperty.all(0.0),
+              shape: MaterialStateProperty.all(const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(50))))),
+        )
+      ]),
       body: Container(
         color: _currentBackgroundColor,
         width: _width,
@@ -137,7 +152,8 @@ class _MainPageState extends State<MainPage> {
                   },
                   icon: const Icon(Icons.palette_rounded)),
               IconButton(
-                  onPressed: () => {},
+                  onPressed: () => showDialog(
+                      context: context, builder: showLineThicknessDialog),
                   icon: const Icon(Icons.line_style_rounded)),
               IconButton(
                   color: _eraserIconColor,
@@ -147,7 +163,7 @@ class _MainPageState extends State<MainPage> {
                   icon: const Icon(Icons.auto_fix_normal_rounded)),
               IconButton(
                   onPressed: () => _sketchPoints.clear(),
-                  icon: const Icon(Icons.refresh_rounded))
+                  icon: const Icon(Icons.refresh_rounded)),
             ],
           ),
         ),
@@ -162,7 +178,7 @@ class _MainPageState extends State<MainPage> {
           child: const Icon(Icons.brush_rounded),
           backgroundColor: _displayBrushColor,
           foregroundColor: _brushIconColor,
-          hoverColor: TinyColor(_currentBrushColor).brighten(10).color,
+          hoverColor: TinyColor(_displayBrushColor).brighten(10).color,
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -261,6 +277,35 @@ class _MainPageState extends State<MainPage> {
           },
           child: const Text('Ok'),
         ),
+      ],
+    );
+  }
+
+  // pop up info dialog builder
+  Widget showLineThicknessDialog(BuildContext context) {
+    return AlertDialog(
+      title: Text("Line Thickness!",
+          style: GoogleFonts.pacifico().copyWith(fontSize: 32),
+          textAlign: TextAlign.center),
+      content: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+        return Slider.adaptive(
+          value: _strokeWidth,
+          onChanged: (newValue) {
+            setState(() => _strokeWidth = newValue);
+          },
+          min: 1,
+          max: 100,
+          thumbColor: _displayBrushColor,
+          activeColor: _displayBrushColor,
+        );
+      }),
+      actions: [
+        TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(_strokeWidth);
+            },
+            child: const Icon(Icons.done_rounded, size: 32))
       ],
     );
   }
