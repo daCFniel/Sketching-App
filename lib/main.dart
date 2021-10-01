@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/widgets.dart';
 import 'package:sketching_app/painter.dart';
 import 'package:sketching_app/point.dart';
 import 'package:flutter/material.dart';
@@ -46,7 +47,12 @@ class _MainPageState extends State<MainPage> {
   final double _strokeWidth = 45.0;
   final StrokeCap _strokeCap = StrokeCap.round;
   Color _currentBrushColor = Colors.deepOrange;
+  Color _displayBrushColor = Colors.deepOrange;
   Color _brushIconColor = Colors.white;
+
+  // Eraser
+  Color _eraserIconColor = Colors.black;
+  bool _isEraserMode = false;
 
   //UI styling
   final double _bottomMenuHeight = 70.0;
@@ -57,10 +63,24 @@ class _MainPageState extends State<MainPage> {
     _width = MediaQuery.of(context).size.width;
     _height = MediaQuery.of(context).size.height;
     // Change the color of brush icon depending on the current brush color
-    if (TinyColor(_currentBrushColor).getBrightness() > 200) {
+    if (TinyColor(_displayBrushColor).getBrightness() > 200) {
       _brushIconColor = Colors.black;
     } else {
       _brushIconColor = Colors.white;
+    }
+    // Swap between brush/eraser icon on main button
+    if (_isEraserMode) {
+      _eraserIconColor = Colors.deepOrange;
+      if (_currentBrushColor != _currentBackgroundColor) {
+        _currentBrushColor = _currentBackgroundColor;
+      }
+    } else {
+      _eraserIconColor = Colors.black;
+      if (_currentBrushColor != _currentBackgroundColor) {
+        _displayBrushColor = _currentBrushColor;
+      } else {
+        _currentBrushColor = _displayBrushColor;
+      }
     }
 
     return Scaffold(
@@ -107,14 +127,23 @@ class _MainPageState extends State<MainPage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               IconButton(
-                  onPressed: () => showDialog(
-                      context: context, builder: showColorPickerBackground),
+                  onPressed: () {
+                    if (_sketchPoints.isEmpty) {
+                      showDialog(
+                          context: context, builder: showColorPickerBackground);
+                    } else {
+                      showDialog(context: context, builder: showPopupDialog);
+                    }
+                  },
                   icon: const Icon(Icons.palette_rounded)),
               IconButton(
                   onPressed: () => {},
                   icon: const Icon(Icons.line_style_rounded)),
               IconButton(
-                  onPressed: () => {},
+                  color: _eraserIconColor,
+                  onPressed: () => setState(() {
+                        _isEraserMode = true;
+                      }),
                   icon: const Icon(Icons.auto_fix_normal_rounded)),
               IconButton(
                   onPressed: () => _sketchPoints.clear(),
@@ -127,9 +156,11 @@ class _MainPageState extends State<MainPage> {
         onLongPress: () =>
             showDialog(context: context, builder: showColorPickerBrush),
         child: FloatingActionButton(
-          onPressed: () => {},
+          onPressed: () => setState(() {
+            _isEraserMode = false;
+          }),
           child: const Icon(Icons.brush_rounded),
-          backgroundColor: _currentBrushColor,
+          backgroundColor: _displayBrushColor,
           foregroundColor: _brushIconColor,
           hoverColor: TinyColor(_currentBrushColor).brighten(10).color,
         ),
@@ -201,6 +232,35 @@ class _MainPageState extends State<MainPage> {
               Navigator.pop(context);
             },
             child: const Icon(Icons.done_rounded, size: 32))
+      ],
+    );
+  }
+
+  // pop up info dialog builder
+  Widget showPopupDialog(BuildContext context) {
+    return AlertDialog(
+      title: Row(
+        children: [
+          const Icon(Icons.info_rounded),
+          const SizedBox(
+            width: 10,
+          ),
+          Text(
+            "Can't change color",
+            style: GoogleFonts.itim().copyWith(fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+      content: Text("Canvas must be empty", style: GoogleFonts.itim()),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('Ok'),
+        ),
       ],
     );
   }
