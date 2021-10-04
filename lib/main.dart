@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tinycolor2/tinycolor2.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 void main() {
   runApp(const MyApp());
@@ -88,8 +89,7 @@ class _MainPageState extends State<MainPage> {
       appBar:
           AppBar(backgroundColor: Colors.transparent, elevation: 0.0, actions: [
         ElevatedButton(
-          onPressed: () => Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => const MainPage())),
+          onPressed: () => Navigator.of(context).push(createRoute()),
           child: const Icon(Icons.add),
           style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all(
@@ -135,7 +135,6 @@ class _MainPageState extends State<MainPage> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
         child: SizedBox(
           height: _bottomMenuHeight,
           child: Row(
@@ -307,6 +306,24 @@ class _MainPageState extends State<MainPage> {
             },
             child: const Icon(Icons.done_rounded, size: 32))
       ],
+    );
+  }
+
+  Route createRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => const MainPage(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = 0.0;
+        const end = 1.0;
+        const curve = Curves.slowMiddle;
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return ScaleTransition(
+          scale: animation.drive(tween),
+          child: child,
+        );
+      },
     );
   }
 }
