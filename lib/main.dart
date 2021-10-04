@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tinycolor2/tinycolor2.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 void main() {
   runApp(const MyApp());
@@ -88,15 +87,18 @@ class _MainPageState extends State<MainPage> {
       extendBodyBehindAppBar: true,
       appBar:
           AppBar(backgroundColor: Colors.transparent, elevation: 0.0, actions: [
-        ElevatedButton(
-          onPressed: () => Navigator.of(context).push(createRoute()),
-          child: const Icon(Icons.add),
-          style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(
-                  TinyColor(Colors.grey).setOpacity(0.1).color),
-              elevation: MaterialStateProperty.all(0.0),
-              shape: MaterialStateProperty.all(const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(50))))),
+        Tooltip(
+          message: "New Page",
+          child: ElevatedButton(
+            onPressed: () => Navigator.of(context).push(createRoute()),
+            child: const Icon(Icons.add),
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(
+                    TinyColor(Colors.grey).setOpacity(0.1).color),
+                elevation: MaterialStateProperty.all(0.0),
+                shape: MaterialStateProperty.all(const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(50))))),
+          ),
         )
       ]),
       body: Container(
@@ -135,34 +137,43 @@ class _MainPageState extends State<MainPage> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
         child: SizedBox(
           height: _bottomMenuHeight,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               IconButton(
-                  onPressed: () {
-                    if (_sketchPoints.isEmpty) {
-                      showDialog(
-                          context: context, builder: showColorPickerBackground);
-                    } else {
-                      showDialog(context: context, builder: showPopupDialog);
-                    }
-                  },
-                  icon: const Icon(Icons.palette_rounded)),
+                onPressed: () {
+                  if (_sketchPoints.isEmpty) {
+                    showDialog(
+                        context: context, builder: showColorPickerBackground);
+                  } else {
+                    showDialog(context: context, builder: showPopupDialog);
+                  }
+                },
+                icon: const Icon(Icons.palette_rounded),
+                tooltip: "Background Color",
+              ),
               IconButton(
-                  onPressed: () => showDialog(
-                      context: context, builder: showLineThicknessDialog),
-                  icon: const Icon(Icons.line_style_rounded)),
+                onPressed: () => showDialog(
+                    context: context, builder: showLineThicknessDialog),
+                icon: const Icon(Icons.line_style_rounded),
+                tooltip: "Line Thickness",
+              ),
               IconButton(
-                  color: _eraserIconColor,
-                  onPressed: () => setState(() {
-                        _isEraserMode = true;
-                      }),
-                  icon: const Icon(Icons.auto_fix_normal_rounded)),
+                color: _eraserIconColor,
+                onPressed: () => setState(() {
+                  _isEraserMode = true;
+                }),
+                icon: const Icon(Icons.auto_fix_normal_rounded),
+                tooltip: "Rubber",
+              ),
               IconButton(
-                  onPressed: () => _sketchPoints.clear(),
-                  icon: const Icon(Icons.refresh_rounded)),
+                onPressed: () => _sketchPoints.clear(),
+                icon: const Icon(Icons.refresh_rounded),
+                tooltip: "Reset",
+              ),
             ],
           ),
         ),
@@ -312,15 +323,17 @@ class _MainPageState extends State<MainPage> {
   Route createRoute() {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => const MainPage(),
+      transitionDuration: const Duration(seconds: 1),
+      reverseTransitionDuration: const Duration(seconds: 1),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = 0.0;
-        const end = 1.0;
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
         const curve = Curves.slowMiddle;
         var tween =
             Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
-        return ScaleTransition(
-          scale: animation.drive(tween),
+        return SlideTransition(
+          position: animation.drive(tween),
           child: child,
         );
       },
