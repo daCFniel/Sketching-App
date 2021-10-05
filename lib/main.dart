@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/widgets.dart';
 import 'package:sketching_app/painter.dart';
 import 'package:sketching_app/point.dart';
+import 'package:sketching_app/dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -178,7 +179,9 @@ class _MainPageState extends State<MainPage>
                     showDialog(
                         context: context, builder: showColorPickerBackground);
                   } else {
-                    showDialog(context: context, builder: showPopupDialog);
+                    showDialog(
+                        context: context,
+                        builder: (context) => const MyDialog());
                   }
                 },
                 icon: const Icon(Icons.palette_rounded),
@@ -300,35 +303,6 @@ class _MainPageState extends State<MainPage>
               Navigator.pop(context);
             },
             child: const Icon(Icons.done_rounded, size: 32))
-      ],
-    );
-  }
-
-  // pop up info dialog builder
-  Widget showPopupDialog(BuildContext context) {
-    return AlertDialog(
-      title: Row(
-        children: [
-          const Icon(Icons.info_rounded),
-          const SizedBox(
-            width: 10,
-          ),
-          Text(
-            "Can't change color",
-            style: GoogleFonts.itim().copyWith(fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-      content: Text("Canvas must be empty", style: GoogleFonts.itim()),
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10))),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: const Text('Ok'),
-        ),
       ],
     );
   }
