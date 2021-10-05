@@ -37,6 +37,7 @@ dependencies:
   flutter_colorpicker: ^0.6.0
   google_fonts: ^2.1.0
   tinycolor2: ^2.0.0
+  confetti: ^0.6.0
 
 dev_dependencies:
   flutter_test:

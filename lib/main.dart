@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tinycolor2/tinycolor2.dart';
+import 'package:confetti/confetti.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,7 +36,11 @@ class MainPage extends StatefulWidget {
   _MainPageState createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage>
+    with SingleTickerProviderStateMixin {
+  // Animation
+  late ConfettiController _controller;
+
   // Screen dimensions
   late double _width;
   late double _height;
@@ -57,6 +62,19 @@ class _MainPageState extends State<MainPage> {
   //UI styling
   final double _bottomMenuHeight = 70.0;
   Color _currentBackgroundColor = const Color(0xFFABCEEB);
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        ConfettiController(duration: const Duration(milliseconds: 500));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,8 +150,19 @@ class _MainPageState extends State<MainPage> {
             });
           },
           child: CustomPaint(
-            painter: MyPainter(_sketchPoints),
-          ),
+              painter: MyPainter(_sketchPoints),
+              child: Align(
+                alignment: Alignment.center,
+                child: ConfettiWidget(
+                  confettiController: _controller,
+                  blastDirectionality: BlastDirectionality.explosive,
+                  numberOfParticles: 20,
+                  minBlastForce: 20,
+                  maxBlastForce: 30,
+                  gravity: 0.5,
+                  shouldLoop: false,
+                ),
+              )),
         ),
       ),
       bottomNavigationBar: BottomAppBar(
@@ -170,7 +199,11 @@ class _MainPageState extends State<MainPage> {
                 tooltip: "Rubber",
               ),
               IconButton(
-                onPressed: () => _sketchPoints.clear(),
+                onPressed: () async {
+                  await magicErase();
+                  _controller.play();
+                  setState(() {});
+                },
                 icon: const Icon(Icons.refresh_rounded),
                 tooltip: "Reset",
               ),
@@ -193,6 +226,15 @@ class _MainPageState extends State<MainPage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
+  }
+
+  Future<void> magicErase() async {
+    for (int i = _sketchPoints.length - 1; i >= 0; i--) {
+      setState(() {
+        _sketchPoints.removeAt(i);
+      });
+      await Future.delayed(const Duration(milliseconds: 1));
+    }
   }
 
   // current brush color setter
