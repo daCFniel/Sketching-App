@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sketching_app/point.dart';
+import 'package:sketching_app/src/point.dart';
 import 'dart:ui';
 
 class MyPainter extends CustomPainter {

@@ -1,8 +1,6 @@
 import 'dart:ui';
+import 'package:sketching_app/classes.dart';
 import 'package:flutter/widgets.dart';
-import 'package:sketching_app/painter.dart';
-import 'package:sketching_app/point.dart';
-import 'package:sketching_app/dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:google_fonts/google_fonts.dart';
