@@ -5,15 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "sketching_app",
-            "request": "launch",
-            "type": "dart"
-        },
-        {
             "name": "sketching_app (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
-        }
+        },
+        {
+            "name": "sketching_app",
+            "request": "launch",
+            "type": "dart"
+        },
     ]
 }
