@@ -1,9 +1,11 @@
 import 'dart:ui';
+import 'package:provider/provider.dart';
 import 'package:sketching_app/classes.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sketching_app/src/thickness.dart';
 import 'package:tinycolor2/tinycolor2.dart';
 import 'package:confetti/confetti.dart';
 
@@ -23,7 +25,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
       ),
-      home: const MainPage(),
+      home: ChangeNotifierProvider(
+          create: (context) => MyBrush(), child: const MainPage()),
     );
   }
 }
@@ -48,7 +51,6 @@ class _MainPageState extends State<MainPage>
   final _sketchPoints = <SketchPoint?>[];
 
   // Brush styling
-  double _strokeWidth = 20.0;
   final StrokeCap _strokeCap = StrokeCap.round;
   Color _currentBrushColor = Colors.deepOrange;
   Color _displayBrushColor = Colors.deepOrange;
@@ -77,6 +79,7 @@ class _MainPageState extends State<MainPage>
 
   @override
   Widget build(BuildContext context) {
+    final _provider = Provider.of<MyBrush>(context);
     _width = MediaQuery.of(context).size.width;
     _height = MediaQuery.of(context).size.height;
     // Change the color of brush icon depending on the current brush color
@@ -128,7 +131,7 @@ class _MainPageState extends State<MainPage>
               _sketchPoints.add(SketchPoint(
                   details.localPosition,
                   Paint()
-                    ..strokeWidth = _strokeWidth
+                    ..strokeWidth = _provider.lineThickness
                     ..strokeCap = _strokeCap
                     ..color = _currentBrushColor));
             });
@@ -138,7 +141,7 @@ class _MainPageState extends State<MainPage>
               _sketchPoints.add(SketchPoint(
                   details.localPosition,
                   Paint()
-                    ..strokeWidth = _strokeWidth
+                    ..strokeWidth = _provider.lineThickness
                     ..strokeCap = _strokeCap
                     ..color = _currentBrushColor));
             });
@@ -187,7 +190,10 @@ class _MainPageState extends State<MainPage>
               ),
               IconButton(
                 onPressed: () => showDialog(
-                    context: context, builder: showLineThicknessDialog),
+                    context: context,
+                    builder: (context) => ThicknessDialog(
+                          myBrush: _provider,
+                        )),
                 icon: const Icon(Icons.line_style_rounded),
                 tooltip: "Line Thickness",
               ),
@@ -302,55 +308,6 @@ class _MainPageState extends State<MainPage>
             },
             child: const Icon(Icons.done_rounded, size: 32))
       ],
-    );
-  }
-
-  // pop up info dialog builder
-  Widget showLineThicknessDialog(BuildContext context) {
-    return AlertDialog(
-      title: Text("Line Thickness!",
-          style: GoogleFonts.pacifico().copyWith(fontSize: 32),
-          textAlign: TextAlign.center),
-      content: StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-        return Slider.adaptive(
-          value: _strokeWidth,
-          onChanged: (newValue) {
-            setState(() => _strokeWidth = newValue);
-          },
-          min: 1,
-          max: 100,
-          thumbColor: _displayBrushColor,
-          activeColor: _displayBrushColor,
-        );
-      }),
-      actions: [
-        TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(_strokeWidth);
-            },
-            child: const Icon(Icons.done_rounded, size: 32))
-      ],
-    );
-  }
-
-  Route createRoute() {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => const MainPage(),
-      transitionDuration: const Duration(seconds: 1),
-      reverseTransitionDuration: const Duration(seconds: 1),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(1.0, 0.0);
-        const end = Offset.zero;
-        const curve = Curves.slowMiddle;
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      },
     );
   }
 }
