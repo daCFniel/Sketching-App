@@ -5,8 +5,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sketching_app/src/bgcolor.dart';
-import 'package:sketching_app/src/thickness.dart';
 import 'package:tinycolor2/tinycolor2.dart';
 import 'package:confetti/confetti.dart';
 
@@ -20,14 +18,16 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Sketching App',
-      theme: ThemeData(
-        primarySwatch: Colors.deepOrange,
+    return ChangeNotifierProvider(
+      create: (context) => MyBrush(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Sketching App',
+        theme: ThemeData(
+          primarySwatch: Colors.deepOrange,
+        ),
+        home: const MainPage(),
       ),
-      home: ChangeNotifierProvider(
-          create: (context) => MyBrush(), child: const MainPage()),
     );
   }
 }
@@ -53,9 +53,9 @@ class _MainPageState extends State<MainPage>
 
   // Brush styling
   final StrokeCap _strokeCap = StrokeCap.round;
-  Color _currentBrushColor = Colors.deepOrange;
   Color _displayBrushColor = Colors.deepOrange;
   Color _brushIconColor = Colors.white;
+  Color _backgroundColor = const Color(0xFFABCEEB);
 
   // Eraser
   Color _eraserIconColor = Colors.black;
@@ -79,7 +79,6 @@ class _MainPageState extends State<MainPage>
 
   @override
   Widget build(BuildContext context) {
-    final _provider = Provider.of<MyBrush>(context);
     _width = MediaQuery.of(context).size.width;
     _height = MediaQuery.of(context).size.height;
     // Change the color of brush icon depending on the current brush color
@@ -91,16 +90,16 @@ class _MainPageState extends State<MainPage>
     // Swap between brush/eraser icon on main button
     if (_isEraserMode) {
       _eraserIconColor = Colors.deepOrange;
-      if (_currentBrushColor != _provider.backgroundColor) {
-        _currentBrushColor = _provider.backgroundColor;
-      }
+      // if (_provider.brushColor != _backgroundColor) {
+      //   _provider.brushColor = _backgroundColor;
+      // }
     } else {
       _eraserIconColor = Colors.black;
-      if (_currentBrushColor != _provider.backgroundColor) {
-        _displayBrushColor = _currentBrushColor;
-      } else {
-        _currentBrushColor = _displayBrushColor;
-      }
+      // if (_provider.brushColor != _backgroundColor) {
+      //   _displayBrushColor = _provider.brushColor;
+      // } else {
+      //   _provider.brushColor = _displayBrushColor;
+      // }
     }
 
     return Scaffold(
@@ -121,50 +120,52 @@ class _MainPageState extends State<MainPage>
           ),
         )
       ]),
-      body: Container(
-        color: _provider.backgroundColor,
-        width: _width,
-        height: _height,
-        child: GestureDetector(
-          onPanStart: (DragStartDetails details) {
-            setState(() {
-              _sketchPoints.add(SketchPoint(
-                  details.localPosition,
-                  Paint()
-                    ..strokeWidth = _provider.lineThickness
-                    ..strokeCap = _strokeCap
-                    ..color = _currentBrushColor));
-            });
-          },
-          onPanUpdate: (DragUpdateDetails details) {
-            setState(() {
-              _sketchPoints.add(SketchPoint(
-                  details.localPosition,
-                  Paint()
-                    ..strokeWidth = _provider.lineThickness
-                    ..strokeCap = _strokeCap
-                    ..color = _currentBrushColor));
-            });
-          },
-          onPanEnd: (DragEndDetails details) {
-            setState(() {
-              _sketchPoints.add(null);
-            });
-          },
-          child: CustomPaint(
-              painter: MyPainter(_sketchPoints),
-              child: Align(
-                alignment: Alignment.center,
-                child: ConfettiWidget(
-                  confettiController: _controller,
-                  blastDirectionality: BlastDirectionality.explosive,
-                  numberOfParticles: 20,
-                  minBlastForce: 20,
-                  maxBlastForce: 30,
-                  gravity: 0.5,
-                  shouldLoop: false,
-                ),
-              )),
+      body: Consumer<MyBrush>(
+        builder: (context, brush, child) => Container(
+          color: _backgroundColor,
+          width: _width,
+          height: _height,
+          child: GestureDetector(
+            onPanStart: (DragStartDetails details) {
+              setState(() {
+                _sketchPoints.add(SketchPoint(
+                    details.localPosition,
+                    Paint()
+                      ..strokeWidth = brush.lineThickness
+                      ..strokeCap = _strokeCap
+                      ..color = brush.brushColor));
+              });
+            },
+            onPanUpdate: (DragUpdateDetails details) {
+              setState(() {
+                _sketchPoints.add(SketchPoint(
+                    details.localPosition,
+                    Paint()
+                      ..strokeWidth = brush.lineThickness
+                      ..strokeCap = _strokeCap
+                      ..color = brush.brushColor));
+              });
+            },
+            onPanEnd: (DragEndDetails details) {
+              setState(() {
+                _sketchPoints.add(null);
+              });
+            },
+            child: CustomPaint(
+                painter: MyPainter(_sketchPoints),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: ConfettiWidget(
+                    confettiController: _controller,
+                    blastDirectionality: BlastDirectionality.explosive,
+                    numberOfParticles: 20,
+                    minBlastForce: 20,
+                    maxBlastForce: 30,
+                    gravity: 0.5,
+                    shouldLoop: false,
+                  ),
+                )),
+          ),
         ),
       ),
       bottomNavigationBar: BottomAppBar(
@@ -179,8 +180,7 @@ class _MainPageState extends State<MainPage>
                   if (_sketchPoints.isEmpty) {
                     showDialog(
                       context: context,
-                      builder: (context) =>
-                          BackgroundColorPicker(myBrush: _provider),
+                      builder: showBackgroundColorPicker,
                     );
                   } else {
                     showDialog(
@@ -194,9 +194,7 @@ class _MainPageState extends State<MainPage>
               IconButton(
                 onPressed: () => showDialog(
                     context: context,
-                    builder: (context) => ThicknessDialog(
-                          myBrush: _provider,
-                        )),
+                    builder: (context) => const ThicknessDialog()),
                 icon: const Icon(Icons.line_style_rounded),
                 tooltip: "Line Thickness",
               ),
@@ -222,16 +220,18 @@ class _MainPageState extends State<MainPage>
         ),
       ),
       floatingActionButton: GestureDetector(
-        onLongPress: () =>
-            showDialog(context: context, builder: showColorPickerBrush),
-        child: FloatingActionButton(
-          onPressed: () => setState(() {
-            _isEraserMode = false;
-          }),
-          child: const Icon(Icons.brush_rounded),
-          backgroundColor: _displayBrushColor,
-          foregroundColor: _brushIconColor,
-          hoverColor: TinyColor(_displayBrushColor).brighten(10).color,
+        onLongPress: () => showDialog(
+            context: context, builder: (context) => const BrushColorPicker()),
+        child: Consumer<MyBrush>(
+          builder: (context, brush, child) => FloatingActionButton(
+            onPressed: () => setState(() {
+              _isEraserMode = false;
+            }),
+            child: const Icon(Icons.brush_rounded),
+            backgroundColor: brush.brushColor,
+            foregroundColor: _brushIconColor,
+            hoverColor: TinyColor(_displayBrushColor).brighten(10).color,
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -247,25 +247,22 @@ class _MainPageState extends State<MainPage>
     }
   }
 
-  // current brush color setter
-  void changeColorBrush(Color color) {
-    setState(() {
-      _currentBrushColor = color;
-    });
-  }
-
-// brush color picker dialog
-  Widget showColorPickerBrush(BuildContext context) {
+  // bg color picker dialog
+  Widget showBackgroundColorPicker(BuildContext context) {
     return AlertDialog(
-      title: Text(
-        'Brush Color!',
-        style: GoogleFonts.pacifico().copyWith(fontSize: 32),
-        textAlign: TextAlign.center,
-      ),
+      title: Text('Background color!',
+          style: GoogleFonts.pacifico().copyWith(fontSize: 32),
+          textAlign: TextAlign.center),
       content: SingleChildScrollView(
-          child: MaterialPicker(
-        pickerColor: _currentBrushColor,
-        onColorChanged: changeColorBrush,
+          child: ColorPicker(
+        pickerColor: _backgroundColor,
+        onColorChanged: (color) => setState(() {
+          _backgroundColor = color;
+        }),
+        pickerAreaHeightPercent: 0.8,
+        enableAlpha: false,
+        showLabel: false,
+        pickerAreaBorderRadius: BorderRadius.circular(10),
       )),
       actions: [
         TextButton(
@@ -273,10 +270,7 @@ class _MainPageState extends State<MainPage>
               setState(() {});
               Navigator.pop(context);
             },
-            child: const Icon(
-              Icons.done_rounded,
-              size: 32,
-            ))
+            child: const Icon(Icons.done_rounded, size: 32))
       ],
     );
   }
