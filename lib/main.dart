@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sketching_app/src/bgcolor.dart';
 import 'package:sketching_app/src/thickness.dart';
 import 'package:tinycolor2/tinycolor2.dart';
 import 'package:confetti/confetti.dart';
@@ -62,7 +63,6 @@ class _MainPageState extends State<MainPage>
 
   //UI styling
   final double _bottomMenuHeight = 70.0;
-  Color _currentBackgroundColor = const Color(0xFFABCEEB);
 
   @override
   void initState() {
@@ -91,12 +91,12 @@ class _MainPageState extends State<MainPage>
     // Swap between brush/eraser icon on main button
     if (_isEraserMode) {
       _eraserIconColor = Colors.deepOrange;
-      if (_currentBrushColor != _currentBackgroundColor) {
-        _currentBrushColor = _currentBackgroundColor;
+      if (_currentBrushColor != _provider.backgroundColor) {
+        _currentBrushColor = _provider.backgroundColor;
       }
     } else {
       _eraserIconColor = Colors.black;
-      if (_currentBrushColor != _currentBackgroundColor) {
+      if (_currentBrushColor != _provider.backgroundColor) {
         _displayBrushColor = _currentBrushColor;
       } else {
         _currentBrushColor = _displayBrushColor;
@@ -122,7 +122,7 @@ class _MainPageState extends State<MainPage>
         )
       ]),
       body: Container(
-        color: _currentBackgroundColor,
+        color: _provider.backgroundColor,
         width: _width,
         height: _height,
         child: GestureDetector(
@@ -178,7 +178,10 @@ class _MainPageState extends State<MainPage>
                 onPressed: () {
                   if (_sketchPoints.isEmpty) {
                     showDialog(
-                        context: context, builder: showColorPickerBackground);
+                      context: context,
+                      builder: (context) =>
+                          BackgroundColorPicker(myBrush: _provider),
+                    );
                   } else {
                     showDialog(
                         context: context,
@@ -251,13 +254,6 @@ class _MainPageState extends State<MainPage>
     });
   }
 
-  // current bg color setter
-  void changeColorBackground(Color color) {
-    setState(() {
-      _currentBackgroundColor = color;
-    });
-  }
-
 // brush color picker dialog
   Widget showColorPickerBrush(BuildContext context) {
     return AlertDialog(
@@ -281,32 +277,6 @@ class _MainPageState extends State<MainPage>
               Icons.done_rounded,
               size: 32,
             ))
-      ],
-    );
-  }
-
-// bg color picker dialog
-  Widget showColorPickerBackground(BuildContext context) {
-    return AlertDialog(
-      title: Text('Background color!',
-          style: GoogleFonts.pacifico().copyWith(fontSize: 32),
-          textAlign: TextAlign.center),
-      content: SingleChildScrollView(
-          child: ColorPicker(
-        pickerColor: _currentBackgroundColor,
-        onColorChanged: changeColorBackground,
-        pickerAreaHeightPercent: 0.8,
-        enableAlpha: false,
-        showLabel: false,
-        pickerAreaBorderRadius: BorderRadius.circular(10),
-      )),
-      actions: [
-        TextButton(
-            onPressed: () {
-              setState(() {});
-              Navigator.pop(context);
-            },
-            child: const Icon(Icons.done_rounded, size: 32))
       ],
     );
   }
