@@ -22,7 +22,8 @@ class MyDialog extends StatelessWidget {
       ),
       content: Text("Canvas must be empty", style: GoogleFonts.itim()),
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10))),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+      ),
       actions: [
         TextButton(
           onPressed: () {

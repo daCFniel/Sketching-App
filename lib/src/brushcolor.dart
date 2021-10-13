@@ -32,14 +32,15 @@ class _BrushColorPickerState extends State<BrushColorPicker> {
       ),
       actions: [
         TextButton(
-            onPressed: () {
-              setState(() {});
-              Navigator.pop(context);
-            },
-            child: const Icon(
-              Icons.done_rounded,
-              size: 32,
-            ))
+          onPressed: () {
+            setState(() {});
+            Navigator.pop(context);
+          },
+          child: const Icon(
+            Icons.done_rounded,
+            size: 32,
+          ),
+        )
       ],
     );
   }

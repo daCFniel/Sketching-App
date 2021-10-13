@@ -29,10 +29,11 @@ class _ThicknessDialogState extends State<ThicknessDialog> {
       ),
       actions: [
         TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Icon(Icons.done_rounded, size: 32))
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Icon(Icons.done_rounded, size: 32),
+        )
       ],
     );
   }

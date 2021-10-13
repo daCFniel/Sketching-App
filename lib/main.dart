@@ -9,7 +9,9 @@ import 'package:tinycolor2/tinycolor2.dart';
 import 'package:confetti/confetti.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    const MyApp(),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -67,8 +69,9 @@ class _MainPageState extends State<MainPage>
   @override
   void initState() {
     super.initState();
-    _controller =
-        ConfettiController(duration: const Duration(milliseconds: 500));
+    _controller = ConfettiController(
+      duration: const Duration(milliseconds: 500),
+    );
   }
 
   @override
@@ -102,6 +105,12 @@ class _MainPageState extends State<MainPage>
       // }
     }
 
+    List<int> first = [1, 2, 3, 4, 5, 6, 7];
+    List<int> second = [3, 5, 6, 7, 9, 10];
+    // A way to subtract two lists
+    List<int> difference = first.toSet().difference(second.toSet()).toList();
+    print(difference.toString());
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar:
@@ -112,11 +121,15 @@ class _MainPageState extends State<MainPage>
             onPressed: () => Navigator.of(context).push(createRoute()),
             child: const Icon(Icons.add),
             style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(
-                    TinyColor(Colors.grey).setOpacity(0.1).color),
-                elevation: MaterialStateProperty.all(0.0),
-                shape: MaterialStateProperty.all(const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(50))))),
+              backgroundColor: MaterialStateProperty.all(
+                  TinyColor(Colors.grey).setOpacity(0.1).color),
+              elevation: MaterialStateProperty.all(0.0),
+              shape: MaterialStateProperty.all(
+                const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(50)),
+                ),
+              ),
+            ),
           ),
         )
       ]),
@@ -127,44 +140,55 @@ class _MainPageState extends State<MainPage>
           height: _height,
           child: GestureDetector(
             onPanStart: (DragStartDetails details) {
-              setState(() {
-                _sketchPoints.add(SketchPoint(
-                    details.localPosition,
-                    Paint()
-                      ..strokeWidth = brush.lineThickness
-                      ..strokeCap = _strokeCap
-                      ..color = brush.brushColor));
-              });
+              setState(
+                () {
+                  _sketchPoints.add(
+                    SketchPoint(
+                        details.localPosition,
+                        Paint()
+                          ..strokeWidth = brush.lineThickness
+                          ..strokeCap = _strokeCap
+                          ..color = brush.brushColor),
+                  );
+                },
+              );
             },
             onPanUpdate: (DragUpdateDetails details) {
-              setState(() {
-                _sketchPoints.add(SketchPoint(
-                    details.localPosition,
-                    Paint()
-                      ..strokeWidth = brush.lineThickness
-                      ..strokeCap = _strokeCap
-                      ..color = brush.brushColor));
-              });
+              setState(
+                () {
+                  _sketchPoints.add(
+                    SketchPoint(
+                        details.localPosition,
+                        Paint()
+                          ..strokeWidth = brush.lineThickness
+                          ..strokeCap = _strokeCap
+                          ..color = brush.brushColor),
+                  );
+                },
+              );
             },
             onPanEnd: (DragEndDetails details) {
-              setState(() {
-                _sketchPoints.add(null);
-              });
+              setState(
+                () {
+                  _sketchPoints.add(null);
+                },
+              );
             },
             child: CustomPaint(
-                painter: MyPainter(_sketchPoints),
-                child: Align(
-                  alignment: Alignment.center,
-                  child: ConfettiWidget(
-                    confettiController: _controller,
-                    blastDirectionality: BlastDirectionality.explosive,
-                    numberOfParticles: 20,
-                    minBlastForce: 20,
-                    maxBlastForce: 30,
-                    gravity: 0.5,
-                    shouldLoop: false,
-                  ),
-                )),
+              painter: MyPainter(_sketchPoints),
+              child: Align(
+                alignment: Alignment.center,
+                child: ConfettiWidget(
+                  confettiController: _controller,
+                  blastDirectionality: BlastDirectionality.explosive,
+                  numberOfParticles: 20,
+                  minBlastForce: 20,
+                  maxBlastForce: 30,
+                  gravity: 0.5,
+                  shouldLoop: false,
+                ),
+              ),
+            ),
           ),
         ),
       ),
@@ -184,8 +208,9 @@ class _MainPageState extends State<MainPage>
                     );
                   } else {
                     showDialog(
-                        context: context,
-                        builder: (context) => const MyDialog());
+                      context: context,
+                      builder: (context) => const MyDialog(),
+                    );
                   }
                 },
                 icon: const Icon(Icons.palette_rounded),
@@ -193,16 +218,19 @@ class _MainPageState extends State<MainPage>
               ),
               IconButton(
                 onPressed: () => showDialog(
-                    context: context,
-                    builder: (context) => const ThicknessDialog()),
+                  context: context,
+                  builder: (context) => const ThicknessDialog(),
+                ),
                 icon: const Icon(Icons.line_style_rounded),
                 tooltip: "Line Thickness",
               ),
               IconButton(
                 color: _eraserIconColor,
-                onPressed: () => setState(() {
-                  _isEraserMode = true;
-                }),
+                onPressed: () => setState(
+                  () {
+                    _isEraserMode = true;
+                  },
+                ),
                 icon: const Icon(Icons.auto_fix_normal_rounded),
                 tooltip: "Rubber",
               ),
@@ -221,12 +249,16 @@ class _MainPageState extends State<MainPage>
       ),
       floatingActionButton: GestureDetector(
         onLongPress: () => showDialog(
-            context: context, builder: (context) => const BrushColorPicker()),
+          context: context,
+          builder: (context) => const BrushColorPicker(),
+        ),
         child: Consumer<MyBrush>(
           builder: (context, brush, child) => FloatingActionButton(
-            onPressed: () => setState(() {
-              _isEraserMode = false;
-            }),
+            onPressed: () => setState(
+              () {
+                _isEraserMode = false;
+              },
+            ),
             child: const Icon(Icons.brush_rounded),
             backgroundColor: brush.brushColor,
             foregroundColor: _brushIconColor,
@@ -240,10 +272,14 @@ class _MainPageState extends State<MainPage>
 
   Future<void> magicErase() async {
     for (int i = _sketchPoints.length - 1; i >= 0; i--) {
-      setState(() {
-        _sketchPoints.removeAt(i);
-      });
-      await Future.delayed(const Duration(milliseconds: 1));
+      setState(
+        () {
+          _sketchPoints.removeAt(i);
+        },
+      );
+      await Future.delayed(
+        const Duration(milliseconds: 1),
+      );
     }
   }
 
@@ -254,23 +290,27 @@ class _MainPageState extends State<MainPage>
           style: GoogleFonts.pacifico().copyWith(fontSize: 32),
           textAlign: TextAlign.center),
       content: SingleChildScrollView(
-          child: ColorPicker(
-        pickerColor: _backgroundColor,
-        onColorChanged: (color) => setState(() {
-          _backgroundColor = color;
-        }),
-        pickerAreaHeightPercent: 0.8,
-        enableAlpha: false,
-        showLabel: false,
-        pickerAreaBorderRadius: BorderRadius.circular(10),
-      )),
+        child: ColorPicker(
+          pickerColor: _backgroundColor,
+          onColorChanged: (color) => setState(
+            () {
+              _backgroundColor = color;
+            },
+          ),
+          pickerAreaHeightPercent: 0.8,
+          enableAlpha: false,
+          showLabel: false,
+          pickerAreaBorderRadius: BorderRadius.circular(10),
+        ),
+      ),
       actions: [
         TextButton(
-            onPressed: () {
-              setState(() {});
-              Navigator.pop(context);
-            },
-            child: const Icon(Icons.done_rounded, size: 32))
+          onPressed: () {
+            setState(() {});
+            Navigator.pop(context);
+          },
+          child: const Icon(Icons.done_rounded, size: 32),
+        )
       ],
     );
   }
