@@ -9,9 +9,7 @@ import 'package:tinycolor2/tinycolor2.dart';
 import 'package:confetti/confetti.dart';
 
 void main() {
-  runApp(
-    const MyApp(),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -51,12 +49,12 @@ class _MainPageState extends State<MainPage>
   late double _height;
 
   // List of points
-  final _sketchPoints = <SketchPoint?>[];
+  final _sketchPoints = <Offset?>[];
+  final _eraserPoints = <Offset?>[];
 
   // Brush styling
   final StrokeCap _strokeCap = StrokeCap.round;
-  Color _displayBrushColor = Colors.deepOrange;
-  Color _brushIconColor = Colors.white;
+  final Color _brushIconColor = Colors.white;
   Color _backgroundColor = const Color(0xFFABCEEB);
 
   // Eraser
@@ -85,11 +83,11 @@ class _MainPageState extends State<MainPage>
     _width = MediaQuery.of(context).size.width;
     _height = MediaQuery.of(context).size.height;
     // Change the color of brush icon depending on the current brush color
-    if (TinyColor(_displayBrushColor).getBrightness() > 200) {
-      _brushIconColor = Colors.black;
-    } else {
-      _brushIconColor = Colors.white;
-    }
+    // if (TinyColor(_displayBrushColor).getBrightness() > 200) {
+    //   _brushIconColor = Colors.black;
+    // } else {
+    //   _brushIconColor = Colors.white;
+    // }
     // Swap between brush/eraser icon on main button
     if (_isEraserMode) {
       _eraserIconColor = Colors.deepOrange;
@@ -104,13 +102,6 @@ class _MainPageState extends State<MainPage>
       //   _provider.brushColor = _displayBrushColor;
       // }
     }
-
-    List<int> first = [1, 2, 3, 4, 5, 6, 7];
-    List<int> second = [3, 5, 6, 7, 9, 10];
-    // A way to subtract two lists
-    List<int> difference = first.toSet().difference(second.toSet()).toList();
-    print(difference.toString());
-
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar:
@@ -142,35 +133,33 @@ class _MainPageState extends State<MainPage>
             onPanStart: (DragStartDetails details) {
               setState(
                 () {
-                  _sketchPoints.add(
-                    SketchPoint(
-                        details.localPosition,
-                        Paint()
-                          ..strokeWidth = brush.lineThickness
-                          ..strokeCap = _strokeCap
-                          ..color = brush.brushColor),
-                  );
+                  if (_isEraserMode) {
+                    _eraserPoints.add(details.localPosition);
+                  } else {
+                    _sketchPoints.add(details.localPosition);
+                  }
                 },
               );
             },
             onPanUpdate: (DragUpdateDetails details) {
               setState(
                 () {
-                  _sketchPoints.add(
-                    SketchPoint(
-                        details.localPosition,
-                        Paint()
-                          ..strokeWidth = brush.lineThickness
-                          ..strokeCap = _strokeCap
-                          ..color = brush.brushColor),
-                  );
+                  if (_isEraserMode) {
+                    _eraserPoints.add(details.localPosition);
+                  } else {
+                    _sketchPoints.add(details.localPosition);
+                  }
                 },
               );
             },
             onPanEnd: (DragEndDetails details) {
               setState(
                 () {
-                  _sketchPoints.add(null);
+                  if (_isEraserMode) {
+                    _eraserPoints.clear();
+                  } else {
+                    _sketchPoints.add(null);
+                  }
                 },
               );
             },
@@ -262,7 +251,7 @@ class _MainPageState extends State<MainPage>
             child: const Icon(Icons.brush_rounded),
             backgroundColor: brush.brushColor,
             foregroundColor: _brushIconColor,
-            hoverColor: TinyColor(_displayBrushColor).brighten(10).color,
+            hoverColor: TinyColor(brush.brushColor).brighten(10).color,
           ),
         ),
       ),
